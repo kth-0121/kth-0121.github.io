@@ -25,15 +25,15 @@ comments: true
 
 일반적인 Dijkstra 알고리즘의 시간 복잡도는 다음과 같다.
 
-$$
+
 O((V + E)\log V)
-$$
+
 
 Bidirectional Dijkstra 역시 이론적인 최악 시간 복잡도는 동일하다.
 
-$$
+
 O((V + E)\log V)
-$$
+
 
 하지만 실제로는 양쪽에서 탐색을 수행하기 때문에 방문하는 정점 수가 크게 감소하여 평균 실행 시간이 더 빠른 경우가 많다.
 
@@ -47,7 +47,6 @@ $$
 #include <bits/stdc++.h>
 
 using namespace std;
-
 #define INF LLONG_MAX
 
 struct Edge
@@ -72,10 +71,82 @@ long long bidirectionalDijkstra(
     int s,int t)
 {
     if(s==t) return 0;
-    
-    vector<long long> 
+
+    vector<long long>  df(n,INF) , db(n,INF);
+    vector <bool> vf(n,false), vb(n,false);
+
+    priority_queue<
+        pair<long long, int>,
+        vector<pair<long long,int>>,
+        greater<pair<long long, int>>
+    > fpq, bpq;
+
+    df[s] = db[t] = 0;
+
+    fpq.push({0,s});
+    bpq.push({0,t});
+
+    long long answer = INF;
+
+    while(!fpq.empty() && !bpq.empty())
+    {
+        if(fpq.top().first+bpq.top().first >= answer)
+            break;
+
+        if(fpq.top().first<=bpq.top().first){
+            pair<long long, int> c = fpq.top();
+            fpq.pop();
+
+            if(vf[c.second]) continue;
+
+            vf[c.second] = true;
+
+            if(vb[c.second])
+                answer = min(answer, df[c.second] + db[c.second]);
+
+            for (int i=0; i < g[c.second].size(); i++){
+                Edge edge = g[c.second][i];
+
+                if(df[edge.to] > df[c.second] + edge.weight){
+                    df[edge.to] = df[c.second] + edge.weight;
+
+                    fpq.push({df[edge.to], edge.to});
+
+                    if(vb[edge.to])
+                        answer = min(answer, df[edge.to]+db[edge.to]);
+                }
+            }
+        }
+        else{
+            pair<long long, int> c = bpq.top();
+            bpq.pop();
+
+            if(vb[c.second]) continue;
+
+            vb[c.second] = true;
+
+            if(vf[c.second])
+                answer = min(answer,df[c.second]+db[c.second]);
+
+            for (int i=0;i<rg[c.second].size();i++){
+                Edge edge = rg[c.second][i];
+
+                if(db[edge.to]>db[c.second]+edge.weight){
+                    db[edge.to] = db[c.second] + edge.weight;
+                    bpq.push({db[edge.to],edge.to});
+
+                    if(vf[edge.to])
+                        answer = min(answer, df[edge.to]+db[edge.to]);
+                }
+            }
+        }
+    }
+
+    if(answer == INF) return -1;
+
+    return answer ;
 }
-                                
+
 int main()
 {
     int n,e,from,to,s,t;long long weight;
