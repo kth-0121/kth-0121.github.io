@@ -1,7 +1,6 @@
 ---
-layout: post
 title: "글로벌 기업 분석 - NVIDIA, Microsoft, Tesla"
-date: 2026-08-05
+date: 2026-08-05 15:00:00 +0900
 categories: [Business]
 tags: [NVIDIA, Microsoft, Tesla, 기업분석]
 ---
